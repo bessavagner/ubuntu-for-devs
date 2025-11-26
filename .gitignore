@@ -36,7 +36,8 @@ ENV/
 .conda/
 
 # Test files (if any)
-test_*.py
+# test_cuda.py is a utility script, keep it
+# test_*.py
 *_test.py
 
 # Personal notes
