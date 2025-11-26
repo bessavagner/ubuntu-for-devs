@@ -1,0 +1,45 @@
+# OS files
+.DS_Store
+Thumbs.db
+*~
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Conda
+.conda/
+
+# Test files (if any)
+test_*.py
+*_test.py
+
+# Personal notes
+notes.txt
+TODO.txt
+
