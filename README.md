@@ -2,16 +2,39 @@
 
 Automated setup scripts for Ubuntu 24.04+ to configure a complete development environment for full-stack development, data science, machine learning, and physics research.
 
+## Project Structure
+
+```
+ubuntu_for_devs/
+├── scripts/                    # Setup scripts
+│   ├── ubuntu_setup_*.sh       # Main setup scripts
+│   └── utils/                   # Utility scripts
+│       ├── add_llm_to_terminal.sh
+│       ├── switch_llm_model.sh
+│       ├── fix_zsh_default.sh
+│       └── ubuntu_utilities.sh
+├── docs/                        # Documentation
+│   ├── TROUBLESHOOTING.md
+│   ├── LLM_RECOMMENDATIONS.md
+│   ├── LLM_TERMINAL_GUIDE.md
+│   └── python_alternatives_guide.md
+├── tests/                       # Test scripts
+│   └── test_cuda.py
+├── README.md                    # This file
+├── LICENSE                      # MIT License
+└── CONTRIBUTING.md              # Contribution guidelines
+```
+
 ## Quick Start
 
 1. **Make all scripts executable:**
    ```bash
-   chmod +x ubuntu_*.sh
+   chmod +x scripts/*.sh scripts/utils/*.sh
    ```
 
 2. **Run the interactive installer:**
    ```bash
-   ./ubuntu_setup_all.sh
+   ./scripts/ubuntu_setup_all.sh
    ```
 
    Or run individual scripts as needed (see below).
@@ -60,7 +83,7 @@ The main setup script that installs essential packages and tools.
 
 **Usage:**
 ```bash
-./ubuntu_setup_main.sh
+./scripts/ubuntu_setup_main.sh
 ```
 
 **Note:** After completion, log out and back in for Docker group changes to take effect.
@@ -84,7 +107,7 @@ Installs and configures zsh with oh-my-zsh and useful plugins.
 
 **Usage:**
 ```bash
-./ubuntu_setup_terminal.sh
+./scripts/ubuntu_setup_terminal.sh
 ```
 
 **After installation:**
@@ -108,7 +131,7 @@ Configures Git and installs GitHub CLI.
 
 **Usage:**
 ```bash
-./ubuntu_setup_git.sh
+./scripts/ubuntu_setup_git.sh
 ```
 
 **Useful commands after setup:**
@@ -142,7 +165,7 @@ Installs additional Python versions alongside the system Python.
 
 **Usage:**
 ```bash
-./ubuntu_setup_python.sh
+./scripts/ubuntu_setup_python.sh
 ```
 
 **After installation:**
@@ -171,7 +194,7 @@ Installs tools for web development.
 
 **Usage:**
 ```bash
-./ubuntu_setup_fullstack.sh
+./scripts/ubuntu_setup_fullstack.sh
 ```
 
 ---
@@ -190,7 +213,7 @@ Sets up a dedicated Conda environment for data science.
 
 **Usage:**
 ```bash
-./ubuntu_setup_datascience.sh
+./scripts/ubuntu_setup_datascience.sh
 ```
 
 **After installation:**
@@ -220,7 +243,7 @@ Sets up a dedicated Conda environment for machine learning.
 
 **Usage:**
 ```bash
-./ubuntu_setup_ml.sh
+./scripts/ubuntu_setup_ml.sh
 ```
 
 **After installation:**
@@ -247,7 +270,7 @@ Sets up a dedicated Conda environment for physics research.
 
 **Usage:**
 ```bash
-./ubuntu_setup_physics.sh
+./scripts/ubuntu_setup_physics.sh
 ```
 
 **After installation:**
@@ -269,23 +292,37 @@ Installs Ollama for running local Large Language Models.
 - Interactive model selection menu
 - Optionally sets up Open WebUI (web interface)
 - Creates launcher script for easy access
+- Optionally adds convenient terminal commands (`llm`, `llm-chat`, etc.)
 
 **Usage:**
 ```bash
-./ubuntu_setup_ollama.sh
+./scripts/ubuntu_setup_ollama.sh
 ```
 
 **After installation:**
 ```bash
-# Run a model
+# Basic Ollama commands
 ollama run deepseek-r1:7b
+
+# Or use convenient terminal commands (if integration enabled)
+llm "What is machine learning?"
+llm-chat  # Interactive session
+llm-explain script.py  # Explain code
+llm-review script.py  # Code review
 
 # Start Web UI (if installed)
 ~/start-ollama-webui.sh
 # Then open: http://localhost:8080
 ```
 
+**Terminal Integration:**
+After running the setup, you'll be prompted to add LLM commands to your terminal. Or install separately:
+```bash
+./scripts/utils/add_llm_to_terminal.sh
+```
+
 **See `LLM_RECOMMENDATIONS.md` for model selection guidance.**
+**See `LLM_TERMINAL_GUIDE.md` for terminal integration usage.**
 
 ---
 
@@ -306,8 +343,8 @@ Interactive menu with useful system maintenance commands.
 
 **Usage:**
 ```bash
-chmod +x ubuntu_utilities.sh
-./ubuntu_utilities.sh
+chmod +x scripts/utils/ubuntu_utilities.sh
+./scripts/utils/ubuntu_utilities.sh
 ```
 
 ---
@@ -318,42 +355,42 @@ For a fresh Ubuntu installation:
 
 ### 1. Essential Setup
 ```bash
-./ubuntu_setup_main.sh
+./scripts/ubuntu_setup_main.sh
 ```
 Then **log out and back in** for Docker to work.
 
 ### 2. Terminal Enhancement
 ```bash
-./ubuntu_setup_terminal.sh
+./scripts/ubuntu_setup_terminal.sh
 chsh -s $(which zsh)
 ```
 Then **log out and back in** again.
 
 ### 3. Development Tools
 ```bash
-./ubuntu_setup_git.sh
+./scripts/ubuntu_setup_git.sh
 ```
 
 ### 4. Choose Your Stack
 
 **For Full-Stack Development:**
 ```bash
-./ubuntu_setup_fullstack.sh
+./scripts/ubuntu_setup_fullstack.sh
 ```
 
 **For Data Science:**
 ```bash
-./ubuntu_setup_datascience.sh
+./scripts/ubuntu_setup_datascience.sh
 ```
 
 **For Machine Learning:**
 ```bash
-./ubuntu_setup_ml.sh
+./scripts/ubuntu_setup_ml.sh
 ```
 
 **For Physics Research:**
 ```bash
-./ubuntu_setup_physics.sh
+./scripts/ubuntu_setup_physics.sh
 ```
 
 **For Multiple Stacks:**
@@ -361,12 +398,12 @@ You can install multiple environments - they use separate Conda environments.
 
 ### 5. Optional - Local AI
 ```bash
-./ubuntu_setup_ollama.sh
+./scripts/ubuntu_setup_ollama.sh
 ```
 
 ### 6. Optional - Additional Python (⚠️ Advanced users only)
 ```bash
-./ubuntu_setup_python.sh
+./scripts/ubuntu_setup_python.sh
 ```
 
 ---
@@ -376,7 +413,7 @@ You can install multiple environments - they use separate Conda environments.
 The easiest way to set up everything:
 
 ```bash
-./ubuntu_setup_all.sh
+./scripts/ubuntu_setup_all.sh
 ```
 
 This provides an interactive menu with options:
@@ -410,22 +447,23 @@ nvidia-smi
 
 # Test CUDA (if ML environment installed)
 conda activate ml
-python test_cuda.py
+python tests/test_cuda.py
 ```
 
 ---
 
 ## Documentation
 
-- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
-- **[LLM_RECOMMENDATIONS.md](LLM_RECOMMENDATIONS.md)** - Guide to selecting LLM models
-- **[after_install_ubuntu.md](after_install_ubuntu.md)** - Original manual setup guide
+- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[docs/LLM_RECOMMENDATIONS.md](docs/LLM_RECOMMENDATIONS.md)** - Guide to selecting LLM models
+- **[docs/LLM_TERMINAL_GUIDE.md](docs/LLM_TERMINAL_GUIDE.md)** - Using LLMs directly from terminal
+- **[docs/python_alternatives_guide.md](docs/python_alternatives_guide.md)** - Python version management guide
 
 ---
 
 ## Troubleshooting
 
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed solutions to common issues.
+See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for detailed solutions to common issues.
 
 **Quick fixes:**
 - **Docker permission denied**: `newgrp docker` or log out/in

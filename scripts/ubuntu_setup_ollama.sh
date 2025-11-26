@@ -246,3 +246,22 @@ if [ -f "$HOME/start-ollama-webui.sh" ]; then
     echo ""
 fi
 echo "For more model recommendations, see: LLM_RECOMMENDATIONS.md"
+echo ""
+echo "============================================"
+echo "Terminal Integration"
+echo "============================================"
+echo ""
+read -p "Add LLM commands to terminal? (y/n) " -n 1 -r
+echo ""
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "$SCRIPT_DIR/utils/add_llm_to_terminal.sh" ]; then
+        "$SCRIPT_DIR/utils/add_llm_to_terminal.sh"
+    else
+        print_info "Terminal integration script not found. Run manually:"
+        echo "  ./scripts/utils/add_llm_to_terminal.sh"
+    fi
+else
+    print_info "Skipping terminal integration"
+    echo "You can add it later with: ./scripts/utils/add_llm_to_terminal.sh"
+fi

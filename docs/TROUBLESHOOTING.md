@@ -12,6 +12,7 @@ Common issues and solutions for Ubuntu development setup scripts.
 - [Git and GitHub Issues](#git-and-github-issues)
 - [Ollama and LLM Issues](#ollama-and-llm-issues)
 - [Permission Issues](#permission-issues)
+- [Conda Issues](#conda-issues)
 - [System Configuration](#system-configuration)
 
 ---
@@ -112,6 +113,36 @@ chsh -s $(which zsh)
 # Or restart your terminal session
 ```
 
+### zsh Not Starting as Default Shell
+
+**Problem:** Default shell is set to zsh, but terminal still opens with bash.
+
+**Solution:**
+1. **Close ALL terminal windows completely** (not just tabs)
+2. **Open a NEW terminal window** (Ctrl+Alt+T)
+3. **OR log out and log back in**
+
+**Verify:**
+```bash
+# Check default shell
+getent passwd $USER | cut -d: -f7
+
+# Should show: /usr/bin/zsh or /bin/zsh
+# If it shows bash, run:
+chsh -s $(which zsh)
+```
+
+**If still not working:**
+```bash
+# Check if gnome-terminal has a custom command set
+gsettings get org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")/ custom-command
+
+# If it shows something other than '', remove it:
+DEFAULT_PROFILE=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${DEFAULT_PROFILE}/ custom-command ''
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${DEFAULT_PROFILE}/ use-custom-command false
+```
+
 ### Oh-my-zsh Not Loading
 
 **Solution:**
@@ -125,6 +156,28 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 # Or copy the template
 cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
 ```
+
+### Sourcing .zshrc from bash
+
+**Error:**
+```
+bash: ${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh: bad substitution
+Error: Oh My Zsh can't be loaded from: bash.
+```
+
+**Cause:** You're trying to source a zsh configuration file (`~/.zshrc`) from bash.
+
+**Solution:**
+- **Don't source .zshrc from bash** - it's a zsh-specific file
+- **Switch to zsh first:**
+  ```bash
+  zsh
+  # Then you can use zsh commands
+  ```
+- **Or reload bash config:**
+  ```bash
+  source ~/.bashrc
+  ```
 
 ---
 
@@ -208,6 +261,70 @@ sudo apt install python3-venv
 # Create virtual environment
 python3 -m venv myenv
 source myenv/bin/activate
+```
+
+---
+
+## Conda Issues
+
+### Conda Base Environment Auto-Activating
+
+**Problem:** Conda base environment activates automatically when opening terminal.
+
+**Solution:**
+```bash
+# Disable auto-activation
+conda config --set auto_activate_base false
+
+# Reload shell configuration
+source ~/.zshrc  # if using zsh
+# OR
+source ~/.bashrc  # if using bash
+
+# Or close and reopen terminal
+```
+
+**Verify:**
+```bash
+conda config --show auto_activate_base
+# Should show: auto_activate: False
+```
+
+### Conda Command Not Found
+
+**Error:**
+```
+conda: command not found
+```
+
+**Solution:**
+```bash
+# Add conda to PATH
+export PATH="$HOME/miniconda3/bin:$PATH"
+
+# Or for Anaconda
+export PATH="$HOME/anaconda3/bin:$PATH"
+
+# Make it permanent - add to ~/.zshrc or ~/.bashrc
+echo 'export PATH="$HOME/miniconda3/bin:$PATH"' >> ~/.zshrc
+```
+
+### Conda Environment Not Activating
+
+**Error:**
+```
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+```
+
+**Solution:**
+```bash
+# Initialize conda for your shell
+conda init zsh  # if using zsh
+# OR
+conda init bash  # if using bash
+
+# Then reload shell
+source ~/.zshrc  # or ~/.bashrc
 ```
 
 ---
@@ -570,8 +687,10 @@ If you find a solution to a problem not listed here, please contribute:
 | Issue | Quick Fix |
 |-------|-----------|
 | Docker permission denied | `newgrp docker` or log out/in |
-| Terminal not opening | Fix shebang: `sudo sed -i '1s|.*|#!/usr/bin/python3.12|' /usr/bin/gnome-terminal` |
-| apt_pkg error | Fix hook: `sudo sed -i '1s|.*|#!/usr/bin/python3.12|' /usr/lib/cnf-update-db` |
+| Terminal not opening | Fix shebang: `sudo sed -i '1s\|.*\|#!/usr/bin/python3.12\|' /usr/bin/gnome-terminal` |
+| zsh not default | `chsh -s $(which zsh)` then close all terminals |
+| apt_pkg error | Fix hook: `sudo sed -i '1s\|.*\|#!/usr/bin/python3.12\|' /usr/lib/cnf-update-db` |
+| Conda auto-activating | `conda config --set auto_activate_base false` |
 | Python version conflict | `sudo update-alternatives --config python3` |
 | Package not found | `sudo apt update` |
 | Broken dependencies | `sudo apt --fix-broken install` |
@@ -581,4 +700,3 @@ If you find a solution to a problem not listed here, please contribute:
 ---
 
 **Last Updated:** Based on Ubuntu 24.04 LTS
-
