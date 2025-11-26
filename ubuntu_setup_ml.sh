@@ -79,6 +79,11 @@ if ! command_exists conda; then
     exit 1
 fi
 
+# Disable auto-activation of base environment (if not already set)
+print_info "Disabling conda base environment auto-activation..."
+conda config --set auto_activate_base false 2>/dev/null || true
+print_success "Conda base auto-activation disabled"
+
 # Create or use ML environment
 echo ""
 print_info "Setting up ML conda environment..."

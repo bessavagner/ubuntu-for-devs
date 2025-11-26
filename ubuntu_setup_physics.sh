@@ -92,6 +92,11 @@ echo ""
 print_info "Setting up scientific Python packages..."
 
 if [ "$USE_CONDA" = true ] && command_exists conda; then
+    # Disable auto-activation of base environment
+    print_info "Disabling conda base environment auto-activation..."
+    conda config --set auto_activate_base false 2>/dev/null || true
+    print_success "Conda base auto-activation disabled"
+    
     # Use conda environment
     if conda env list | grep -q "^physics "; then
         print_success "Environment 'physics' already exists"

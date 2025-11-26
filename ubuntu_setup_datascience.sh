@@ -54,6 +54,9 @@ if [ ! -d "$HOME/miniconda3" ] && [ ! -d "$HOME/anaconda3" ]; then
     "$HOME/miniconda3/bin/conda" init bash
     "$HOME/miniconda3/bin/conda" init zsh
     
+    # Disable auto-activation of base environment
+    "$HOME/miniconda3/bin/conda" config --set auto_activate_base false
+    
     # Add conda to PATH for current session
     export PATH="$HOME/miniconda3/bin:$PATH"
     
@@ -72,6 +75,11 @@ fi
 if command_exists conda; then
     CONDA_VERSION=$(conda --version)
     print_success "Conda available: $CONDA_VERSION"
+    
+    # Disable auto-activation of base environment (if not already set)
+    print_info "Disabling conda base environment auto-activation..."
+    conda config --set auto_activate_base false 2>/dev/null || true
+    print_success "Conda base auto-activation disabled"
 else
     print_error "Conda installation failed or not in PATH"
     exit 1
