@@ -326,7 +326,36 @@ After running the setup, you'll be prompted to add LLM commands to your terminal
 
 ---
 
-#### 10. `ubuntu_utilities.sh` - System Utilities Menu
+#### 10. `ubuntu_setup_claude.sh` - Claude Code + Skills
+
+Installs the [Claude Code](https://claude.com/claude-code) CLI (if missing) and a
+curated set of community skill/plugin marketplaces.
+
+**What it does:**
+- Installs the Claude Code CLI via the official installer (skips if already present)
+- Adds and installs two native plugin marketplaces:
+  - **academic-research-skills** ([Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills)) — research, writing, peer review, pipeline orchestration
+  - **oh-my-claudecode / OMC** ([Yeachan-Heo/oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode)) — multi-agent orchestration, 28 agents, 32 skills
+- Installs **Matt Pocock's skills** ([mattpocock/skills](https://github.com/mattpocock/skills)) by copying the SKILL.md directories into `~/.claude/skills/` (no Node.js required)
+
+**Usage:**
+```bash
+./scripts/ubuntu_setup_claude.sh
+```
+
+**After installation:**
+```bash
+claude plugin list                 # List installed plugins
+claude plugin marketplace list     # List marketplaces
+claude plugin update <name>        # Update a plugin
+# Run /setup-matt-pocock-skills inside Claude Code to configure those skills
+```
+
+> Restart any running Claude Code session for newly installed skills to load.
+
+---
+
+#### 11. `ubuntu_utilities.sh` - System Utilities Menu
 
 Interactive menu with useful system maintenance commands.
 
