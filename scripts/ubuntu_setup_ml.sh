@@ -115,10 +115,12 @@ if [ "$HAS_NVIDIA_GPU" = true ]; then
     echo ""
     print_info "GPU detected - Setting up CUDA support..."
     
-    # Install CUDA toolkit via conda (easier than system-wide)
-    print_info "Installing CUDA toolkit via conda..."
-    conda install -c conda-forge cudatoolkit=11.8 cudnn=8.1 -y -q || conda install -c nvidia cuda-toolkit -y -q
-    print_success "CUDA toolkit installed"
+    # Modern PyTorch and TensorFlow pip wheels bundle their own CUDA + cuDNN
+    # runtime, so a separate conda CUDA toolkit is no longer needed (the old
+    # cudatoolkit=11.8 / cudnn=8.1 pins break on recent drivers). The installed
+    # NVIDIA driver supplies the rest.
+    print_info "Skipping separate CUDA toolkit (pip wheels bundle the CUDA runtime)."
+    print_success "CUDA support will come from the framework wheels below"
 fi
 
 # Install PyTorch
@@ -127,7 +129,7 @@ print_info "Installing PyTorch..."
 if [ "$HAS_NVIDIA_GPU" = true ]; then
     # GPU version
     print_info "Installing PyTorch with CUDA support..."
-    pip install --quiet torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    pip install --quiet torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
     print_success "PyTorch (GPU) installed"
 else
     # CPU version
