@@ -37,22 +37,43 @@ if [[ $EUID -eq 0 ]]; then
    exit 1
 fi
 
+# Add nvm initialization to a shell config file if not already present
+setup_nvm_in_shell() {
+    local rc_file="$1"
+    [ -f "$rc_file" ] || return 0
+    if grep -q 'NVM_DIR' "$rc_file"; then
+        return 0
+    fi
+    print_info "Adding nvm config to $rc_file"
+    {
+        echo ''
+        echo '# nvm (Node Version Manager)'
+        echo 'export NVM_DIR="$HOME/.nvm"'
+        echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+        echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    } >> "$rc_file"
+}
+
 # Install Node.js via nvm
 print_info "Setting up Node.js with nvm (Node Version Manager)..."
 if [ ! -d "$HOME/.nvm" ]; then
     print_info "Installing nvm..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
-    
+
     # Load nvm in current shell
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    
+
     print_success "nvm installed"
 else
     print_success "nvm already installed"
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 fi
+
+# Persist nvm config for new terminals (bash and zsh)
+setup_nvm_in_shell "$HOME/.bashrc"
+setup_nvm_in_shell "$HOME/.zshrc"
 
 # Install latest LTS Node.js
 if command_exists node; then
@@ -303,9 +324,8 @@ echo "     - MySQL: sudo mysql_secure_installation"
 echo "     - MongoDB: mongosh"
 echo "     - Redis: redis-cli"
 echo ""
-echo "  2. For nvm to work in new terminals, add to ~/.zshrc or ~/.bashrc:"
-echo "     export NVM_DIR=\"\$HOME/.nvm\""
-echo "     [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\""
+echo "  2. nvm was added to ~/.bashrc / ~/.zshrc automatically."
+echo "     Open a new terminal (or 'source ~/.bashrc') to use node/npm."
 echo ""
 echo "  3. Test Docker Compose: docker compose version"
 echo ""

@@ -71,7 +71,7 @@ fi
 print_info "Installing essential packages..."
 sudo nala install -y \
     htop fastfetch bpytop clang cargo libc6-i386 libc6-x32 \
-    libu2f-udev samba-common-bin exfat-fuse default-jdk \
+    samba-common-bin exfat-fuse default-jdk \
     curl wget unrar linux-headers-$(uname -r) linux-headers-generic \
     git gstreamer1.0-vaapi unzip ntfs-3g p7zip gcc make bzip2 tar \
     software-properties-common
