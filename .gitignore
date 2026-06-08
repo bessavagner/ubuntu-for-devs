@@ -44,3 +44,6 @@ ENV/
 notes.txt
 TODO.txt
 
+# oh-my-claudecode tool state
+.omc/
+
