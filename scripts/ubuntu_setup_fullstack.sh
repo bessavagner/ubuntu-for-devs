@@ -37,22 +37,43 @@ if [[ $EUID -eq 0 ]]; then
    exit 1
 fi
 
+# Add nvm initialization to a shell config file if not already present
+setup_nvm_in_shell() {
+    local rc_file="$1"
+    [ -f "$rc_file" ] || return 0
+    if grep -q 'NVM_DIR' "$rc_file"; then
+        return 0
+    fi
+    print_info "Adding nvm config to $rc_file"
+    {
+        echo ''
+        echo '# nvm (Node Version Manager)'
+        echo 'export NVM_DIR="$HOME/.nvm"'
+        echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+        echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    } >> "$rc_file"
+}
+
 # Install Node.js via nvm
 print_info "Setting up Node.js with nvm (Node Version Manager)..."
 if [ ! -d "$HOME/.nvm" ]; then
     print_info "Installing nvm..."
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
+
     # Load nvm in current shell
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    
+
     print_success "nvm installed"
 else
     print_success "nvm already installed"
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 fi
+
+# Persist nvm config for new terminals (bash and zsh)
+setup_nvm_in_shell "$HOME/.bashrc"
+setup_nvm_in_shell "$HOME/.zshrc"
 
 # Install latest LTS Node.js
 if command_exists node; then
@@ -184,9 +205,18 @@ esac
 case $DB_CHOICE in
     3|5)
         print_info "Installing MongoDB..."
-        # Add MongoDB GPG key and repository
-        curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
-        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+        # MongoDB only publishes repos for LTS codenames (jammy/noble). Map the
+        # running release to the closest supported one; default to noble (24.04).
+        UBUNTU_CODENAME=$(. /etc/os-release && echo "$VERSION_CODENAME")
+        case "$UBUNTU_CODENAME" in
+            jammy) MONGO_CODENAME="jammy" ;;
+            noble) MONGO_CODENAME="noble" ;;
+            *)     MONGO_CODENAME="noble" ;;  # newer/unknown releases -> latest supported
+        esac
+        print_info "Using MongoDB repository for '$MONGO_CODENAME' (host: $UBUNTU_CODENAME)"
+        # Add MongoDB 8.0 GPG key and repository
+        curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu ${MONGO_CODENAME}/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
         
         sudo apt update
         sudo apt install -y mongodb-org
@@ -259,7 +289,8 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     if ! command_exists gcloud; then
         print_info "Installing Google Cloud SDK..."
         echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+        # apt-key is deprecated/removed on modern Ubuntu; use a dearmored keyring instead
+        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
         sudo apt update
         sudo apt install -y google-cloud-cli
         print_success "Google Cloud SDK installed"
@@ -293,9 +324,8 @@ echo "     - MySQL: sudo mysql_secure_installation"
 echo "     - MongoDB: mongosh"
 echo "     - Redis: redis-cli"
 echo ""
-echo "  2. For nvm to work in new terminals, add to ~/.zshrc or ~/.bashrc:"
-echo "     export NVM_DIR=\"\$HOME/.nvm\""
-echo "     [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\""
+echo "  2. nvm was added to ~/.bashrc / ~/.zshrc automatically."
+echo "     Open a new terminal (or 'source ~/.bashrc') to use node/npm."
 echo ""
 echo "  3. Test Docker Compose: docker compose version"
 echo ""

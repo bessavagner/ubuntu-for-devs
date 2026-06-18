@@ -96,7 +96,18 @@ if [ "$USE_CONDA" = true ] && command_exists conda; then
     print_info "Disabling conda base environment auto-activation..."
     conda config --set auto_activate_base false 2>/dev/null || true
     print_success "Conda base auto-activation disabled"
-    
+
+    # Accept Terms of Service for the default Anaconda channels.
+    # Newer conda (24.x+) refuses to create environments from the default
+    # channels until their ToS are accepted, raising CondaToSNonInteractiveError.
+    # The `conda tos` subcommand only exists on these newer versions, so guard.
+    if conda tos --help >/dev/null 2>&1; then
+        print_info "Accepting Terms of Service for default conda channels..."
+        conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main 2>/dev/null || true
+        conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r 2>/dev/null || true
+        print_success "Conda channel Terms of Service accepted"
+    fi
+
     # Use conda environment
     if conda env list | grep -q "^physics "; then
         print_success "Environment 'physics' already exists"

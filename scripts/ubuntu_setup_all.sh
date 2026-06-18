@@ -80,6 +80,7 @@ show_individual_menu() {
     echo "Optional:"
     echo "  8) Ollama (Local LLMs)"
     echo "  9) Additional Python Versions ⚠️  CAUTION"
+    echo " 10) Claude Code + Skills (academic-research, OMC, mattpocock)"
     echo ""
     echo "  0) Back to main menu"
     echo ""
@@ -246,6 +247,8 @@ custom_install() {
     echo ""
     read -p "Additional Python versions? ⚠️  (y/n) " -n 1 PYTHON
     echo ""
+    read -p "Claude Code + Skills? (y/n) " -n 1 CLAUDE
+    echo ""
 
     echo ""
     echo "Starting custom installation..."
@@ -260,6 +263,7 @@ custom_install() {
     [[ $PHYSICS =~ ^[Yy]$ ]] && run_script "ubuntu_setup_physics.sh" "Physics & Scientific Computing" && echo ""
     [[ $OLLAMA =~ ^[Yy]$ ]] && run_script "ubuntu_setup_ollama.sh" "Ollama Setup" && echo ""
     [[ $PYTHON =~ ^[Yy]$ ]] && run_script "ubuntu_setup_python.sh" "Python Setup" && echo ""
+    [[ $CLAUDE =~ ^[Yy]$ ]] && run_script "ubuntu_setup_claude.sh" "Claude Code + Skills" && echo ""
 
     print_success "Custom install completed!"
 }
@@ -278,6 +282,7 @@ individual_scripts() {
             7) run_script "ubuntu_setup_physics.sh" "Physics & Scientific Computing" ;;
             8) run_script "ubuntu_setup_ollama.sh" "Ollama Setup" ;;
             9) run_script "ubuntu_setup_python.sh" "Python Setup" ;;
+            10) run_script "ubuntu_setup_claude.sh" "Claude Code + Skills" ;;
             0) break ;;
             *) print_error "Invalid option" ;;
         esac

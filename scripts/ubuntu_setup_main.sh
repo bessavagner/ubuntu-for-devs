@@ -70,8 +70,8 @@ fi
 # Install essential packages
 print_info "Installing essential packages..."
 sudo nala install -y \
-    htop neofetch bpytop clang cargo libc6-i386 libc6-x32 \
-    libu2f-udev samba-common-bin exfat-fuse default-jdk \
+    htop fastfetch bpytop clang cargo libc6-i386 libc6-x32 \
+    samba-common-bin exfat-fuse default-jdk \
     curl wget unrar linux-headers-$(uname -r) linux-headers-generic \
     git gstreamer1.0-vaapi unzip ntfs-3g p7zip gcc make bzip2 tar \
     software-properties-common
@@ -153,6 +153,7 @@ echo "  - ./ubuntu_setup_terminal.sh    (zsh, oh-my-zsh, plugins)"
 echo "  - ./ubuntu_setup_ollama.sh      (Local LLM with DeepSeek)"
 echo "  - ./ubuntu_setup_git.sh         (Git and GitHub CLI config)"
 echo "  - ./ubuntu_setup_python.sh      (Additional Python versions - USE WITH CAUTION)"
+echo "  - ./ubuntu_setup_claude.sh      (Claude Code CLI + curated skills/plugins)"
 echo ""
 echo "Note: You should log out and back in for Docker group changes to take effect"
 echo "Then test Docker with: docker run hello-world"
